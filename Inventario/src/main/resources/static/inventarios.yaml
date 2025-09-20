@@ -1,0 +1,523 @@
+openapi: 3.0.3
+info:
+  title: API de Gestión de Inventarios
+  description: |-
+    API para la gestión de productos, categorías, proveedores, almacenes y movimientos de inventario.
+    Permite realizar operaciones CRUD completas sobre los recursos principales del sistema.
+  version: 1.0.0
+servers:
+  - url: https://api.tuempresa.com/v1
+    description: Servidor de producción
+
+tags:
+  - name: Productos
+    description: Operaciones sobre los productos
+  - name: Categorias
+    description: Gestión de categorías de productos
+  - name: Proveedores
+    description: Gestión de proveedores
+  - name: Almacenes
+    description: Operaciones sobre los almacenes y su stock
+  - name: Movimientos
+    description: Registro y consulta de movimientos de inventario
+
+paths:
+  # ==================== CATEGORÍAS ====================
+  /categorias:
+    get:
+      tags:
+        - Categorias
+      summary: Listar todas las categorías
+      description: Obtiene una lista de todas las categorías de productos disponibles.
+      operationId: getCategorias
+      parameters:
+        - name: page
+          in: query
+          description: Número de página para paginación
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Límite de items por página
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Lista de categorías exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Categoria'
+        '400':
+          description: Parámetros de paginación inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Categorias
+      summary: Crear una nueva categoría
+      description: Agrega una nueva categoría al catálogo.
+      operationId: createCategoria
+      requestBody:
+        description: Objeto de la categoría a crear
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoriaInput'
+      responses:
+        '201':
+          description: Categoría creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+        '400':
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: La categoría ya existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /categorias/{categoriaId}:
+    get:
+      tags:
+        - Categorias
+      summary: Obtener una categoría por ID
+      description: Obtiene los detalles de una categoría específica.
+      operationId: getCategoriaById
+      parameters:
+        - name: categoriaId
+          in: path
+          required: true
+          description: ID de la categoría
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Datos de la categoría
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+        '404':
+          description: Categoría no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Categorias
+      summary: Actualizar una categoría existente
+      description: Actualiza los datos de una categoría existente.
+      operationId: updateCategoria
+      parameters:
+        - name: categoriaId
+          in: path
+          required: true
+          description: ID de la categoría a actualizar
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        description: Objeto con los datos actualizados de la categoría
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoriaInput'
+      responses:
+        '200':
+          description: Categoría actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categoria'
+        '400':
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Categoría no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Categorias
+      summary: Eliminar una categoría
+      description: Elimina una categoría del sistema. No se puede eliminar si tiene productos asociados.
+      operationId: deleteCategoria
+      parameters:
+        - name: categoriaId
+          in: path
+          required: true
+          description: ID de la categoría a eliminar
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '204':
+          description: Categoría eliminada exitosamente
+        '404':
+          description: Categoría no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: No se puede eliminar, tiene productos asociados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ==================== PROVEEDORES ====================
+  /proveedores:
+    get:
+      tags:
+        - Proveedores
+      summary: Listar todos los proveedores
+      description: Obtiene una lista paginada de todos los proveedores.
+      operationId: getProveedores
+      parameters:
+        - name: page
+          in: query
+          description: Número de página para paginación
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Límite de items por página
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: activo
+          in: query
+          description: Filtrar por estado activo/inactivo
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Lista de proveedores exitosa
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Proveedor'
+        '400':
+          description: Parámetros de consulta inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      tags:
+        - Proveedores
+      summary: Crear un nuevo proveedor
+      description: Agrega un nuevo proveedor al sistema.
+      operationId: createProveedor
+      requestBody:
+        description: Objeto del proveedor a crear
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProveedorInput'
+      responses:
+        '201':
+          description: Proveedor creado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proveedor'
+        '400':
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: El proveedor ya existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /proveedores/{proveedorId}:
+    get:
+      tags:
+        - Proveedores
+      summary: Obtener un proveedor por ID
+      description: Obtiene los detalles de un proveedor específico.
+      operationId: getProveedorById
+      parameters:
+        - name: proveedorId
+          in: path
+          required: true
+          description: ID del proveedor
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Datos del proveedor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proveedor'
+        '404':
+          description: Proveedor no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+        - Proveedores
+      summary: Actualizar un proveedor existente
+      description: Actualiza los datos de un proveedor existente.
+      operationId: updateProveedor
+      parameters:
+        - name: proveedorId
+          in: path
+          required: true
+          description: ID del proveedor a actualizar
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        description: Objeto con los datos actualizados del proveedor
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProveedorInput'
+      responses:
+        '200':
+          description: Proveedor actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Proveedor'
+        '400':
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Proveedor no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - Proveedores
+      summary: Eliminar un proveedor
+      description: Elimina un proveedor del sistema. No se puede eliminar si tiene productos asociados.
+      operationId: deleteProveedor
+      parameters:
+        - name: proveedorId
+          in: path
+          required: true
+          description: ID del proveedor a eliminar
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '204':
+          description: Proveedor eliminado exitosamente
+        '404':
+          description: Proveedor no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: No se puede eliminar, tiene productos asociados
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ... (mantener tus endpoints existentes de productos, almacenes, movimientos)
+
+components:
+  schemas:
+    # ==================== ESQUEMAS DE CATEGORÍA ====================
+    Categoria:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          example: 1
+        nombre:
+          type: string
+          example: "Electrónicos"
+        descripcion:
+          type: string
+          example: "Dispositivos electrónicos y gadgets"
+        creado_en:
+          type: string
+          format: date-time
+          readOnly: true
+          example: "2024-01-20T10:30:00Z"
+        actualizado_en:
+          type: string
+          format: date-time
+          readOnly: true
+          example: "2024-01-20T10:30:00Z"
+
+    CategoriaInput:
+      type: object
+      required:
+        - nombre
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "Electrónicos"
+        descripcion:
+          type: string
+          maxLength: 500
+          example: "Dispositivos electrónicos y gadgets"
+
+    # ==================== ESQUEMAS DE PROVEEDOR ====================
+    Proveedor:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+          example: 1
+        nombre:
+          type: string
+          example: "TecnoSuministros S.A."
+        contacto_nombre:
+          type: string
+          example: "Juan Pérez"
+        contacto_email:
+          type: string
+          format: email
+          example: "juan@tecnosuministros.com"
+        contacto_telefono:
+          type: string
+          example: "+52 55 1234 5678"
+        direccion:
+          type: string
+          example: "Av. Tecnología 123, CDMX"
+        activo:
+          type: boolean
+          example: true
+        creado_en:
+          type: string
+          format: date-time
+          readOnly: true
+          example: "2024-01-20T10:30:00Z"
+        actualizado_en:
+          type: string
+          format: date-time
+          readOnly: true
+          example: "2024-01-20T10:30:00Z"
+
+    ProveedorInput:
+      type: object
+      required:
+        - nombre
+        - contacto_email
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 150
+          example: "TecnoSuministros S.A."
+        contacto_nombre:
+          type: string
+          maxLength: 100
+          example: "Juan Pérez"
+        contacto_email:
+          type: string
+          format: email
+          maxLength: 100
+          example: "juan@tecnosuministros.com"
+        contacto_telefono:
+          type: string
+          maxLength: 50
+          example: "+52 55 1234 5678"
+        direccion:
+          type: string
+          maxLength: 200
+          example: "Av. Tecnología 123, CDMX"
+        activo:
+          type: boolean
+          default: true
+          example: true
+
+    # ==================== ESQUEMA DE ERROR ====================
+    Error:
+      type: object
+      properties:
+        codigo:
+          type: string
+          example: "CATEGORIA_NO_ENCONTRADA"
+        mensaje:
+          type: string
+          example: "La categoría solicitada no existe"
+        detalles:
+          type: array
+          items:
+            type: string
+        timestamp:
+          type: string
+          format: date-time
+          example: "2024-01-20T10:30:00Z"
+
+  # ==================== RESPUESTAS REUTILIZABLES ====================
+  responses:
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Datos de entrada inválidos
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Conflicto con el estado actual
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'

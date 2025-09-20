@@ -1,0 +1,30 @@
+Clases creadas para la API de Inventarios (según OpenAPI inventarios.yaml):
+
+Paquete: com.grovana.inventarios
+
+- config.InventariosApplication
+
+- exception.ApiError
+- exception.GlobalExceptionHandler
+- exception.BadRequestException
+- exception.ConflictException
+- exception.ResourceNotFoundException
+
+- model.Categoria
+- model.Proveedor
+
+- repository.CategoriaRepository
+- repository.ProveedorRepository
+
+- dto.CategoriaDto
+- dto.CategoriaInputDto
+- dto.ProveedorDto
+- dto.ProveedorInputDto
+
+- service.CategoriaService
+- service.ProveedorService
+- service.impl.CategoriaServiceImpl
+- service.impl.ProveedorServiceImpl
+
+- controller.CategoriaController
+- controller.ProveedorController

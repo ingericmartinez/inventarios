@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inventario API - Inicio</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji"; margin: 2rem; color: #1f2937; }
+    h1 { color: #111827; }
+    .card { border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem 1.25rem; max-width: 920px; background: #fafafa; }
+    ul { line-height: 1.9; }
+    a { color: #2563eb; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .note { font-size: 0.95rem; color: #374151; margin-top: 1rem; }
+    code { background: #f3f4f6; padding: 0.15rem 0.35rem; border-radius: 4px; }
+    .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; }
+    .subcard { border: 1px solid #e5e7eb; border-radius: 8px; padding: .75rem 1rem; background: #fff; }
+    .subcard h3 { margin: 0 0 .5rem; font-size: 1rem; color: #111827; }
+  </style>
+</head>
+<body>
+  <h1>Inventario API</h1>
+  <div class="card">
+    <p>Bienvenido. Usa los siguientes enlaces para explorar recursos y documentación:</p>
+
+    <div class="cols">
+      <div class="subcard">
+        <h3>Recursos</h3>
+        <ul>
+          <li><a href="/categorias" target="_self">Ver categorías</a></li>
+          <li><a href="/proveedores" target="_self">Ver proveedores</a></li>
+        </ul>
+      </div>
+
+      <div class="subcard">
+        <h3>Documentación</h3>
+        <ul>
+          <li><a href="/swagger-ui.html" target="_self">Swagger UI</a></li>
+          <li><a href="/v3/api-docs" target="_self">OpenAPI (JSON)</a></li>
+          <li><a href="/v3/api-docs.yaml" target="_self">OpenAPI (YAML)</a></li>
+          <li><a href="/static/inventarios.yaml" target="_self">OpenAPI (inventarios.yaml)</a></li>
+        </ul>
+      </div>
+
+      <div class="subcard">
+        <h3>Base de datos</h3>
+        <ul>
+          <li><a href="/h2-console" target="_self">Consola H2</a></li>
+          <li>JDBC URL: <code>jdbc:h2:mem:inventario</code></li>
+          <li>User: <code>sa</code> • Password: <code>(vacío)</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="subcard">
+      <h3>Arquitectura</h3>
+      <ul>
+        <li><a href="/ARCHITECTURE.md" target="_self">Guía de arquitectura (Hexagonal, Sagas, Prod)</a></li>
+      </ul>
+    </div>
+ 
+     <div class="note">
+      <p>Nota:</p>
+      <ul>
+        <li>La API está protegida con <strong>Basic Auth</strong>.</li>
+        <li>Lectura (GET): <code>user / user123</code> o <code>admin / admin123</code>.</li>
+        <li>Crear/Actualizar/Eliminar (POST/PUT/DELETE): <code>admin / admin123</code>.</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
